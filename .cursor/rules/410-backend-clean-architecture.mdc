@@ -1,0 +1,92 @@
+---
+description: Clean Architecture for API endpoints
+globs:
+  - "app/api/**/*"
+  - "pages/api/**/*"
+alwaysApply: true
+---
+
+# Clean Architecture for API Endpoints
+
+## Layered Architecture Pattern
+
+All API endpoints **MUST** follow clean architecture principles with strict separation of concerns:
+
+- Controller layer: auth, input validation, mapping, one service call, HTTP response mapping.
+- Service layer: business rules, orchestration, repository calls, transformations, logging.
+- Repository layer: database access, snake_case <-> camelCase mapping, DB error handling.
+
+**Golden Rule: Controllers -> Services -> Repositories (NEVER skip layers)**
+
+## Controller Layer (Route Handlers)
+
+Controllers **MUST** do exactly these 5 things, in this order:
+1. Check authentication (`verifyAuthApp`)
+2. Validate input (Zod schemas)
+3. Map input to internal objects (extract validated data)
+4. Call service (ONE service method with all business logic)
+5. Map service response to HTTP response (return NextResponse)
+
+### Strictly Forbidden in Controllers
+
+- NO business logic
+- NO direct repository calls
+- NO helper functions with business logic
+- NO permission checks
+- NO entity validation
+- NO data transformation
+- NO external API calls
+- NO multiple service calls for one operation
+
+## Service Layer (Business Logic)
+
+### Core Responsibilities
+
+- Validate business rules
+- Orchestrate multiple repository calls
+- Transform data between layers
+- Log business events (Pino)
+- Handle errors with proper context
+- Coordinate transactions
+- Call external APIs if needed
+
+### Strictly Forbidden in Services
+
+- NO HTTP concerns (status codes, headers, NextResponse)
+- NO Zod input validation
+- NO direct database queries (use repositories)
+
+## Repository Layer (Data Access)
+
+### Core Responsibilities
+
+- Database query abstraction
+- Data mapping (snake_case <-> camelCase)
+- Connection management
+- Query optimization
+- Database error handling
+
+### Strictly Forbidden in Repositories
+
+- NO business logic
+- NO permission checks
+- NO business validation
+- NO HTTP concerns
+
+## Critical Rules
+
+- Dependency direction: Controllers -> Services -> Repositories
+- Error handling split by layer responsibilities
+- Input validation in controllers, business validation in services
+- Data transformation in repositories/services
+- Export only methods used by the immediate upper layer
+
+## Common Anti-Patterns to Avoid
+
+- Fat controllers with business logic
+- Controllers calling repositories directly
+- Anemic services
+- Repositories with business logic
+- Multiple service calls in controllers
+- Services returning HTTP status codes
+- Controller helpers with business logic

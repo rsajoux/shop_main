@@ -1,0 +1,47 @@
+---
+description: CRITICAL - Supabase database calls ONLY on the server (never client-side)
+globs:
+  - "**/*.tsx"
+  - "**/*.ts"
+  - "**/*.jsx"
+  - "**/*.js"
+alwaysApply: true
+---
+
+# CRITICAL SECURITY RULE: Supabase Database Calls ONLY on the Server
+
+Supabase clients for database operations (queries, inserts, updates, deletes, RPCs) MUST NEVER be created or used in client-side code.
+
+**Allowed (Server-side only):**
+- Server Components (default in App Router - no 'use client')
+- Server Actions ('use server')
+- Route Handlers (app/api/.../route.ts)
+- Pages API routes (/pages/api - legacy)
+- Service files imported only from server contexts (`src/services/*`)
+- Any file that imports `server-only`
+
+**Strictly forbidden (Client-side):**
+- Any file with 'use client' at the top
+- Client Components
+- Hooks (`src/hooks/*`)
+- Browser-executed code
+- Direct usage in client-rendered .tsx files
+
+## Implementation Rules
+
+1. Create Supabase clients centrally:
+   - Server-side client: `src/lib/supabase/server.ts`
+   - Auth-aware server client: use cookies/headers to get session
+   - NEVER create a client with `createClient()` in client code for DB operations
+
+2. Protect server-only Supabase code:
+   - Always import `server-only` at the top of any file that creates or uses a Supabase client for DB access
+
+import 'server-only';
+import { createServerClient } from '@/lib/supabase/server';
+
+## Client-side Supabase usage (limited)
+
+- Only allowed for auth (`signIn`, `signOut`, `getSession`) via auth helpers.
+- Never perform `.from('table').select()/insert()/update()` on client.
+- If data is needed on client -> fetch via Server Action, Route Handler, or Server Component.
