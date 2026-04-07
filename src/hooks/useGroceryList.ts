@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
-import { INITIAL_GROCERY_STATE, MOCK_COLLABORATORS } from "@/constants/grocery";
+import { MOCK_COLLABORATORS } from "@/constants/grocery";
 import { loadGroceryState, saveGroceryState } from "@/lib/local-storage";
 import { addItemSchema } from "@/lib/validation";
 import type {

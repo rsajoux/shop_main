@@ -4,7 +4,7 @@ import type { SelectHTMLAttributes } from "react";
 
 import { cn } from "@/lib/utils";
 
-export interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {}
+export type SelectProps = SelectHTMLAttributes<HTMLSelectElement>;
 
 export const Select = ({ className, children, ...props }: SelectProps) => (
   <select
